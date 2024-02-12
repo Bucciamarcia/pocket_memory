@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "234837708660",
+    "project_id": "pocketmemory-c2dd8",
+    "storage_bucket": "pocketmemory-c2dd8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:234837708660:android:5dac3fdc235f8988b2a621",
+        "android_client_info": {
+          "package_name": "com.example.pocket_memory"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAFHEf8u0RFvw7QwtMK0H9gwHgwYSBTQF8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
