@@ -27,45 +27,35 @@ class HomeScreen extends StatelessWidget {
 }
 
 class AppHome extends StatelessWidget {
+  final paddingInBetween = const EdgeInsets.only(bottom: 50);
   const AppHome({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text("PocketMemory")
-        ),
+        appBar: AppBar(title: const Text("PocketMemory")),
         body: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            Padding(
-              padding: const EdgeInsets.only(bottom: 20),
-              child: Center(
+              Center(
                 child: ElevatedButton.icon(
                   onPressed: () => Navigator.pushNamed(context, "/newmemory"),
                   label: const Text("New Memory"),
                   icon: const Icon(Icons.add),
                 ),
-              ),
             ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 20),
-              child: Center(
+              Center(
                 child: ElevatedButton.icon(
                   onPressed: () => Navigator.pushNamed(context, "/getmemory"),
                   label: const Text("Retrieve Memory"),
                   icon: const Icon(Icons.list),
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 20),
-              child: Center(
-                child: ElevatedButton.icon(
-                  onPressed: () => Navigator.pushNamed(context, "/settings"),
-                  label: const Text("Settings"),
-                  icon: const FaIcon(FontAwesomeIcons.gear),
-                ),
+            Center(
+              child: ElevatedButton.icon(
+                onPressed: () => Navigator.pushNamed(context, "/settings"),
+                label: const Text("Settings"),
+                icon: const FaIcon(FontAwesomeIcons.gear),
               ),
             ),
           ],

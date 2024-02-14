@@ -5,12 +5,19 @@ final ThemeData appThemeData = ThemeData(
   appBarTheme: const AppBarTheme(
     backgroundColor: Colors.lightBlue,
   ),
-  buttonTheme: const ButtonThemeData(
-    buttonColor: Colors.white,
-  ),
   useMaterial3: true,
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ButtonStyle(
+      padding: MaterialStateProperty.all(EdgeInsets.all(22)),
+      shape: MaterialStateProperty.all(
+        RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(1000),
+          side: const BorderSide(
+            color: Colors.blue,
+            width: 1,
+          ),
+        ),
+      ),
       backgroundColor: MaterialStateProperty.all(Colors.white),
       overlayColor: MaterialStateProperty.all(Colors.lightBlueAccent),
       iconColor: MaterialStateProperty.all(Colors.black87),
