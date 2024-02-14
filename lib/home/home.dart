@@ -1,4 +1,5 @@
 import "package:flutter/material.dart";
+import "package:font_awesome_flutter/font_awesome_flutter.dart";
 import "../services/auth.dart";
 import "../login/login.dart";
 
@@ -63,7 +64,7 @@ class AppHome extends StatelessWidget {
                 child: ElevatedButton.icon(
                   onPressed: () => Navigator.pushNamed(context, "/settings"),
                   label: const Text("Settings"),
-                  icon: const Icon(Icons.logout),
+                  icon: const FaIcon(FontAwesomeIcons.gear),
                 ),
               ),
             ),
