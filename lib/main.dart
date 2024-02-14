@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pocket_memory/routes.dart';
 import "firebase_options.dart";
 import 'package:firebase_core/firebase_core.dart';
+import "theme.dart";
 
 
 void main() async {
@@ -20,17 +21,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'PocketMemory',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.lightBlue),
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.lightBlue,
-        ),
-        buttonTheme: const ButtonThemeData(
-          buttonColor: Colors.orange,
-          textTheme: ButtonTextTheme.primary,
-        ),
-        useMaterial3: true,
-      ),
+      theme: appThemeData,
       routes: appRoutes,
     );
   }

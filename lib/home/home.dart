@@ -1,7 +1,6 @@
 import "package:flutter/material.dart";
 import "../services/auth.dart";
 import "../login/login.dart";
-import "../services/firestore.dart";
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -32,20 +31,42 @@ class AppHome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(),
+        appBar: AppBar(
+          title: const Text("PocketMemory")
+        ),
         body: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Center(child: Text("Welcome to PocketMemory!")),
-            ElevatedButton.icon(
-                icon: Icon(Icons.logout, color: Colors.grey[700]),
-                onPressed: () => AuthService().signOut(),
-                label: const Text("Log out")),
-            ElevatedButton.icon(
-                icon: Icon(Icons.account_circle, color: Colors.grey[700]),
-                onPressed: () => FirestoreService().addUser(),
-                label: const Text("Add me to the DB!")
-            )
+            Padding(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: Center(
+                child: ElevatedButton.icon(
+                  onPressed: () => Navigator.pushNamed(context, "/newmemory"),
+                  label: const Text("New Memory"),
+                  icon: const Icon(Icons.add),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: Center(
+                child: ElevatedButton.icon(
+                  onPressed: () => Navigator.pushNamed(context, "/getmemory"),
+                  label: const Text("Retrieve Memory"),
+                  icon: const Icon(Icons.list),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: Center(
+                child: ElevatedButton.icon(
+                  onPressed: () => Navigator.pushNamed(context, "/settings"),
+                  label: const Text("Settings"),
+                  icon: const Icon(Icons.logout),
+                ),
+              ),
+            ),
           ],
         ));
   }
