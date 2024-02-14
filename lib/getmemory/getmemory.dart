@@ -1,7 +1,7 @@
 import "package:flutter/material.dart";
 
-class GetMemory extends StatelessWidget {
-  const GetMemory({super.key});
+class GetMemoryScreen extends StatelessWidget {
+  const GetMemoryScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
