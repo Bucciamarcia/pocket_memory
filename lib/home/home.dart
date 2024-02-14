@@ -1,6 +1,7 @@
 import "package:flutter/material.dart";
 import "../services/auth.dart";
 import "../login/login.dart";
+import "../services/firestore.dart";
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -12,7 +13,6 @@ class HomeScreen extends StatelessWidget {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             // Show loading bar
-            print("Status waiting!");
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             final error = snapshot.error;
@@ -40,7 +40,12 @@ class AppHome extends StatelessWidget {
             ElevatedButton.icon(
                 icon: Icon(Icons.logout, color: Colors.grey[700]),
                 onPressed: () => AuthService().signOut(),
-                label: const Text("Log out"))
+                label: const Text("Log out")),
+            ElevatedButton.icon(
+                icon: Icon(Icons.account_circle, color: Colors.grey[700]),
+                onPressed: () => FirestoreService().addUser(),
+                label: const Text("Add me to the DB!")
+            )
           ],
         ));
   }
