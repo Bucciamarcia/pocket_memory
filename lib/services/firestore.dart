@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import "package:flutter/material.dart";
 import "dart:async";
-import "package:pocket_memory/services/auth.dart";
+import "../services/auth.dart";
 import "dart:developer";
 
 class FirestoreService {
@@ -30,9 +30,7 @@ class CreateMemory {
 
   CreateMemory({required this.embeddings, required this.memoryText});
 
-  Future<double> addPermanent(
-    
-  ) async {
+  Future<double> addPermanent() async {
     try {
       _db.collection("users").doc(userId).collection("memories").add({
         "embeddings": embeddings,
@@ -45,5 +43,22 @@ class CreateMemory {
       return 500;
     }
   }
+}
 
+class CreateUserData {
+  Future<void> addToDb(final String id, final bool anon) async {
+    try {
+      FirebaseFirestore.instance
+          .collection("users")
+          .doc(id)
+          .set(
+        {
+          "isAnonymous": anon,
+        },
+      );
+      debugPrint("Added anon $id user to db");
+    } catch (e) {
+      debugPrint("Error adding anon user to db: $e");
+    }
+  }
 }

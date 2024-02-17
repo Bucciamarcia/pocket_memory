@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pocket_memory/services/auth.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -9,8 +10,15 @@ class SettingsScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text("Settings"),
       ),
-      body: const Center(
-        child: Text("Settings"),
+      body: Center(
+        child: ElevatedButton.icon(
+          onPressed:()  {
+            AuthService().signOut();
+            Navigator.of(context).pushNamedAndRemoveUntil("/", (route) => false);
+          },
+          icon: const Icon(Icons.logout),
+          label: const Text("Sign Out"),
+        )
       ),
     );
   }
