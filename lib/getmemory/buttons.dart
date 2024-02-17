@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import "package:cloud_functions/cloud_functions.dart";
 
-import 'answer.dart';
-
 class GetMemory extends StatelessWidget {
   final String memoryText;
   const GetMemory({super.key, required this.memoryText});
@@ -60,6 +58,24 @@ class GetMemory extends StatelessWidget {
                 },
               );
               answer = result.data["answer"] as String;
+
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: const Text("Memory Retrieved"),
+                    content: Text(answer),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text("Close"),
+                      ),
+                    ],
+                  );
+                },
+              );
             } catch (e) {
               debugPrint("ERROR CAUGHT");
               debugPrint(e.toString());
@@ -72,13 +88,6 @@ class GetMemory extends StatelessWidget {
               // Stop the function if an error is caught
               return;
             }
-              // Return the result page
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => AnswerScreen(answer: answer),
-                ),
-              );
           },
           ),
     );
