@@ -67,6 +67,7 @@ class AddMemory extends StatelessWidget {
                   backgroundColor: Colors.red,
                 ),
               );
+              return;
             }
             Future<double> result = CreateMemory(
               embeddings: embeddings,
