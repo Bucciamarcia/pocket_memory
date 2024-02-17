@@ -12,7 +12,8 @@ from langchain_community.vectorstores.faiss import FAISS
 from langchain_openai import OpenAIEmbeddings
 from openai import OpenAI, OpenAIError
 import os
-from py import scripts
+from py import retrieve_memories
+from py.common import Firestore_Db
 
 
 initialize_app()
@@ -99,12 +100,34 @@ def retrieve_memory(req: https_fn.Request) -> https_fn.Response:
     
     logger.info(f"Results: {results}")
 
-    answer = scripts.retrieve_answer(query, results)
+    answer = retrieve_memories.retrieve_answer(query, results)
 
     logger.info(f"Answer: {answer}")
     
 
     # Return a 200 response for now
     response_data = json.dumps({"data": {"answer": answer}})
+    response = https_fn.Response(response_data, status=200, headers={"Content-Type": "application/json"})
+    return response
+
+@https_fn.on_request()
+def autoremove_guests(req: https_fn.Request) -> https_fn.Response:
+    logger.debug(f"Request: {req.json}")
+    data = req.json["data"]
+    user = data['user']
+
+    logger.info(f"Checking if user is anonymous: {user}")
+    is_anon = Firestore_Db().check_anon(user=user)
+    logger.info(f"Is user anonymous: {is_anon}")
+
+    if is_anon:
+        logger.info(f"Removing anonymous user: {user}")
+        response = Firestore_Db().remove_user(user=user)
+        logger.info(f"User removed: {response}")
+    else:
+        logger.info(f"User is not anonymous, will not remove: {user}")
+        
+
+    response_data = json.dumps({"data": {"result": is_anon}})
     response = https_fn.Response(response_data, status=200, headers={"Content-Type": "application/json"})
     return response
