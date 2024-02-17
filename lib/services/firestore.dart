@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import "package:flutter/material.dart";
 import "dart:async";
 import "package:pocket_memory/services/auth.dart";
 import "dart:developer";
@@ -40,6 +41,7 @@ class CreateMemory {
       });
       return 200;
     } catch (e) {
+      debugPrint("Error adding memory: $e");
       return 500;
     }
   }

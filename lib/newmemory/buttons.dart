@@ -62,10 +62,26 @@ class AddMemory extends StatelessWidget {
               debugPrint("ERROR CAUGHT");
               debugPrint(e.toString());
             }
-            CreateMemory(
+            Future<double> result = CreateMemory(
               embeddings: embeddings,
               memoryText: memoryText,
             ).addPermanent();
+            debugPrint("RESULT: ${await result}");
+            if (await result == 200) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text("Memory added!"),
+                  backgroundColor: Colors.green[800],
+                ),
+              );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text("ERROR: Memory not added!"),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
           },
           ),
     );
