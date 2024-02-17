@@ -44,6 +44,8 @@ dependencies:
   json_serializable: ^6.7.1
   json_annotation: ^4.8.1
   build_runner: ^2.4.8
+  speech_to_text: ^6.6.0
+  cloud_functions: ^4.6.5
 
 dev_dependencies:
   flutter_test:

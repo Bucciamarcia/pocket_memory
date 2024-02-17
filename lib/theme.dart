@@ -8,7 +8,7 @@ final ThemeData appThemeData = ThemeData(
   useMaterial3: true,
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ButtonStyle(
-      padding: MaterialStateProperty.all(EdgeInsets.all(22)),
+      padding: MaterialStateProperty.all(const EdgeInsets.all(22)),
       shape: MaterialStateProperty.all(
         RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(1000),
@@ -18,12 +18,12 @@ final ThemeData appThemeData = ThemeData(
           ),
         ),
       ),
-      backgroundColor: MaterialStateProperty.all(Colors.white),
+      backgroundColor: MaterialStateProperty.all(Colors.lightBlue[50]),
+      foregroundColor: MaterialStateProperty.all(Colors.black87),
       overlayColor: MaterialStateProperty.all(Colors.lightBlueAccent),
       iconColor: MaterialStateProperty.all(Colors.black87),
       textStyle: MaterialStateProperty.all(
-        TextStyle(
-          foreground: Paint()..color = Colors.black87,
+        const TextStyle(
           fontSize: 22,
         ),
       ),

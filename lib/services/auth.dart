@@ -1,5 +1,6 @@
 import "package:firebase_auth/firebase_auth.dart";
 import "package:google_sign_in/google_sign_in.dart";
+import "dart:developer";
 
 class AuthService {
   final userStream = FirebaseAuth.instance.authStateChanges();
@@ -28,7 +29,7 @@ class AuthService {
 
     await FirebaseAuth.instance.signInWithCredential(authCredential);
   } on FirebaseAuthException catch (e) {
-    print(e);
+    log(e as String);
   }
 }
 

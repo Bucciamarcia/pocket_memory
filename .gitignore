@@ -31,6 +31,9 @@ migrate_working_dir/
 .pub/
 /build/
 /functions/venv
+.fuse_hidden*
+functions/.runtimeconfig.json
+functions/.env
 
 # Symbolication related
 app.*.symbols

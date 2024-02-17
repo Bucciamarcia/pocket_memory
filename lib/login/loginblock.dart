@@ -64,7 +64,6 @@ class _LoginBlockState extends State<LoginBlock> {
           // Handle navigation or state changes after login if necessary
         } catch (e) {
           // Handle errors if any
-          print("Login Error: $e");
         } finally {
           setState(() {
             _isLoggingIn = false; // Reset login state
