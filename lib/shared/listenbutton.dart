@@ -47,23 +47,28 @@ class _SpeechRecognitionWidgetState extends State<SpeechRecognitionWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(1000),
-        border: Border.all(
-          color: Colors.lightBlue,
-          width: 1,
+    if (!_speechEnabled) {
+      // If speech is not enabled, dont display the button
+      return const SizedBox.shrink();
+    } else {
+      return DecoratedBox(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(1000),
+          border: Border.all(
+            color: Colors.lightBlue,
+            width: 1,
+          ),
         ),
-      ),
-      child: IconButton(
-        onPressed:
-            _speechToText.isNotListening ? _startListening : _stopListening,
-        icon: FaIcon(_speechToText.isNotListening
-            ? FontAwesomeIcons.microphone
-            : FontAwesomeIcons.microphoneSlash),
-        color: Colors.blue,
-      ),
-    );
+        child: IconButton(
+          onPressed:
+              _speechToText.isNotListening ? _startListening : _stopListening,
+          icon: FaIcon(_speechToText.isNotListening
+              ? FontAwesomeIcons.microphone
+              : FontAwesomeIcons.microphoneSlash),
+          color: Colors.blue,
+        ),
+      );
+    }
   }
 }

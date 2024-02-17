@@ -2,3 +2,8 @@ firebase_functions~=0.1.0
 openai
 python-dotenv
 google-cloud-logging
+langchain
+langchain-community
+faiss-cpu
+langchain-openai
+tiktoken

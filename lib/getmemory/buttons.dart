@@ -1,8 +1,10 @@
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import "package:cloud_functions/cloud_functions.dart";
-import 'package:pocket_memory/services/firestore.dart';
+
+import 'answer.dart';
 
 class GetMemory extends StatelessWidget {
   final String memoryText;
@@ -10,9 +12,10 @@ class GetMemory extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String answer;
     return Expanded(
       child: ElevatedButton.icon(
-          label: const Text("Get Memory"),
+          label: const Text("Retrieve Memory"),
           icon: const FaIcon(FontAwesomeIcons.plus),
           style: ElevatedButtonTheme.of(context).style?.copyWith(
                 backgroundColor: memoryText == ""
@@ -44,44 +47,38 @@ class GetMemory extends StatelessWidget {
                     : null,
               ),
           onPressed: () async {
-            List<double> embeddings = [];
             try {
 
 
               HttpsCallableResult<dynamic> result = await FirebaseFunctions
                   .instance
-                  .httpsCallable('get_embeddings')
+                  .httpsCallable('retrieve_memory')
                   .call(
                 {
                   "memoryText": memoryText,
+                  "user": FirebaseAuth.instance.currentUser!.uid,
                 },
               );
-              embeddings = (result.data["embeddings"] as List<dynamic>).map((e) => e as double).toList();
-              debugPrint("EMBEDDINGS: $embeddings");
+              answer = result.data["answer"] as String;
             } catch (e) {
               debugPrint("ERROR CAUGHT");
               debugPrint(e.toString());
-            }
-            Future<double> result = CreateMemory(
-              embeddings: embeddings,
-              memoryText: memoryText,
-            ).addPermanent();
-            debugPrint("RESULT: ${await result}");
-            if (await result == 200) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Text("Memory added!"),
-                  backgroundColor: Colors.green[800],
-                ),
-              );
-            } else {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text("ERROR: Memory not added!"),
+                  content: Text("ERROR: Can't retrieve Memory!"),
                   backgroundColor: Colors.red,
                 ),
               );
+              // Stop the function if an error is caught
+              return;
             }
+              // Return the result page
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AnswerScreen(answer: answer),
+                ),
+              );
           },
           ),
     );

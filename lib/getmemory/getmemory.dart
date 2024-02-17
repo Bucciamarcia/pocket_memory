@@ -17,7 +17,7 @@ class _GetMemoryScreenState extends State<GetMemoryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('New Memory'),
+        title: const Text('Retrieve Memory'),
       ),
       body: Center(
         child: Column(

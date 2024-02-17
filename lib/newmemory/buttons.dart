@@ -61,6 +61,12 @@ class AddMemory extends StatelessWidget {
             } catch (e) {
               debugPrint("ERROR CAUGHT");
               debugPrint(e.toString());
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text("ERROR: Memory not added!"),
+                  backgroundColor: Colors.red,
+                ),
+              );
             }
             Future<double> result = CreateMemory(
               embeddings: embeddings,
