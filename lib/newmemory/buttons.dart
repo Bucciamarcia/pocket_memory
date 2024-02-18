@@ -44,9 +44,11 @@ class AddMemory extends StatelessWidget {
                   : null,
             ),
         onPressed: () async {
+          showLoadingDialog(context);
+          var timeout = Future.delayed(Duration(seconds: 5));
           List<double> embeddings = [];
           try {
-            HttpsCallableResult<dynamic> result = await FirebaseFunctions
+            HttpsCallableResult<dynamic> resultEmbeddings = await FirebaseFunctions
                 .instance
                 .httpsCallable('get_embeddings')
                 .call(
@@ -54,7 +56,7 @@ class AddMemory extends StatelessWidget {
                 "memoryText": memoryText,
               },
             );
-            embeddings = (result.data["embeddings"] as List<dynamic>)
+            embeddings = (resultEmbeddings.data["embeddings"] as List<dynamic>)
                 .map((e) => e as double)
                 .toList();
             debugPrint("EMBEDDINGS: $embeddings");
@@ -74,6 +76,8 @@ class AddMemory extends StatelessWidget {
             memoryText: memoryText,
           ).addPermanent();
           debugPrint("RESULT: ${await result}");
+          await Future.any([result, timeout]);
+          Navigator.of(context, rootNavigator: true).pop();
           if (await result == 200) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -171,11 +175,13 @@ class AddTempMemory extends StatelessWidget {
                   ),
                   TextButton(
                     onPressed: () async {
+                      showLoadingDialog(context);
                       final int result = await buildMemory(
                         memoryText,
                         int.parse(tempController.text),
                       );
                       if (result == 200) {
+                        Navigator.of(context, rootNavigator: true).pop();
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text("Memory added!"),
@@ -184,6 +190,7 @@ class AddTempMemory extends StatelessWidget {
                         );
                         Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false);
                       } else {
+                        Navigator.of(context, rootNavigator: true).pop();
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text("ERROR: Memory not added!"),
@@ -204,7 +211,7 @@ class AddTempMemory extends StatelessWidget {
   }
 }
 
-buildMemory(String memoryText, int expirationDays) async {
+Future<int> buildMemory(String memoryText, int expirationDays) async {
   List<double> embeddings = [];
   try {
     HttpsCallableResult<dynamic> result =
@@ -238,4 +245,26 @@ buildMemory(String memoryText, int expirationDays) async {
   } else {
     return 500;
   }
+}
+
+Future<void> showLoadingDialog(BuildContext context) async {
+  return showDialog<void>(
+    context: context,
+    barrierDismissible: false, // User must not close the dialog manually
+    builder: (BuildContext context) {
+      return const Dialog(
+        child: Padding(
+          padding: EdgeInsets.all(20.0),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(width: 20),
+              Text("Adding Memory..."),
+            ],
+          ),
+        ),
+      );
+    },
+  );
 }
