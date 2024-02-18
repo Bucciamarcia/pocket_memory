@@ -34,6 +34,7 @@ migrate_working_dir/
 .fuse_hidden*
 functions/.runtimeconfig.json
 functions/.env
+pocketmemory-c2dd8-18d644a06414.json
 
 # Symbolication related
 app.*.symbols

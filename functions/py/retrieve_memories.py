@@ -1,22 +1,9 @@
 from openai import OpenAI, OpenAIError
 import os
 import logging
-import google.cloud.logging
 
 # Initialize stdout and cloud logger
-client = google.cloud.logging.Client()
-logger = client.logger("my-log-name")
-handler = google.cloud.logging.handlers.CloudLoggingHandler(client)
 logger = logging.getLogger("cloudLogger")
-logger.setLevel(logging.INFO)
-logger.addHandler(handler)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-handler.setFormatter(formatter)
-
-# Add console logger
-consoleHandler = logging.StreamHandler()
-consoleHandler.setFormatter(formatter)
-logger.addHandler(consoleHandler)
 
 
 def retrieve_answer(query: str, memories:list[str]) -> str:
@@ -49,10 +36,14 @@ NOTES:
 
     logger.info(f"MESSAGES:\n\n{messages}")
 
-    response = client.chat.completions.create(
-        model=os.getenv("MODEL_NAME"),
-        messages=messages,
-        temperature=0
-    )
+    try:
+        response = client.chat.completions.create(
+            model=os.getenv("MODEL_NAME"),
+            messages=messages,
+            temperature=0
+        )
 
-    return response.choices[0].message.content
+        return response.choices[0].message.content
+    except OpenAIError as e:
+        logger.error(f"OpenAIError: {e}")
+        raise e

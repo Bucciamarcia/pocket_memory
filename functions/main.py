@@ -2,17 +2,20 @@
 # To get started, simply uncomment the below code or create your own.
 # Deploy with `firebase deploy`
 
-from firebase_functions import https_fn, firestore_fn
+from firebase_functions import https_fn
 from firebase_admin import initialize_app, firestore
 import google.cloud.firestore
 import json
+import functions_framework
 import logging
 import google.cloud.logging
 from langchain_community.vectorstores.faiss import FAISS
 from langchain_openai import OpenAIEmbeddings
 from openai import OpenAI, OpenAIError
 import os
-from py import scripts
+from py import retrieve_memories
+from py.common import Firestore_Db
+from cloudevents.http.event import CloudEvent
 
 
 initialize_app()
@@ -99,7 +102,7 @@ def retrieve_memory(req: https_fn.Request) -> https_fn.Response:
     
     logger.info(f"Results: {results}")
 
-    answer = scripts.retrieve_answer(query, results)
+    answer = retrieve_memories.retrieve_answer(query, results)
 
     logger.info(f"Answer: {answer}")
     
@@ -108,3 +111,24 @@ def retrieve_memory(req: https_fn.Request) -> https_fn.Response:
     response_data = json.dumps({"data": {"answer": answer}})
     response = https_fn.Response(response_data, status=200, headers={"Content-Type": "application/json"})
     return response
+
+@functions_framework.cloud_event
+def autoremove_guests(cloud_event: CloudEvent) -> None:
+
+    users = Firestore_Db().get_all_users()
+    for user in users:
+        logger.info(f"Checking if user is anonymous: {user}")
+        is_anon = Firestore_Db().check_anon(user=user)
+        logger.info(f"Is user anonymous: {is_anon}")
+
+        if is_anon:
+            logger.info(f"Removing anonymous user: {user}")
+            response = Firestore_Db().remove_user(user=user)
+            logger.info(f"User removed: {response}")
+        else:
+            logger.info(f"User is not anonymous, will not remove: {user}")
+        
+
+    response_data = json.dumps({"data": {"result": is_anon}})
+    response = https_fn.Response(response_data, status=200, headers={"Content-Type": "application/json"})
+    return None
