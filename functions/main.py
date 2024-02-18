@@ -17,6 +17,8 @@ import os
 from py import retrieve_memories
 from py.common import Firestore_Db
 from cloudevents.http.event import CloudEvent
+import firebase_admin
+
 
 
 initialize_app()
@@ -75,9 +77,7 @@ def retrieve_memory(req: https_fn.Request) -> https_fn.Response:
     user = data['user']
     logger.info(f"Retrieving memory: {query} | For user: {user}")
     
-    # Get all memories from firestore
-    db = firestore.client()
-    memories = db.collection("users").document(user).collection("memories").stream()
+    memories = Firestore_Db().get_memories_stream(user=user)
 
     # Turn the memories into a list of dictionaries
     memories_list = []
@@ -86,7 +86,7 @@ def retrieve_memory(req: https_fn.Request) -> https_fn.Response:
         memories_list.append(memory_dict)
     
     # Print the first memory list
-    logger.debug(f"FIRST MEMORY: {memories_list[0]}")
+    logger.debug(f"Memories: {memories_list}")
     
     # Create the faiss block for langchain
     memory_embeddings = [memory['embeddings'] for memory in memories_list]

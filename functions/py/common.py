@@ -88,3 +88,6 @@ class Firestore_Db:
             memory_dict["id"] = memory.id
             memories_list.append(memory_dict)
         return memories_list
+    
+    def get_memories_stream(self, user:str) -> list:
+        return self.db.collection("users").document(user).collection("memories").stream()
