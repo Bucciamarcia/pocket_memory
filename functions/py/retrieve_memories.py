@@ -36,10 +36,14 @@ NOTES:
 
     logger.info(f"MESSAGES:\n\n{messages}")
 
-    response = client.chat.completions.create(
-        model=os.getenv("MODEL_NAME"),
-        messages=messages,
-        temperature=0
-    )
+    try:
+        response = client.chat.completions.create(
+            model=os.getenv("MODEL_NAME"),
+            messages=messages,
+            temperature=0
+        )
 
-    return response.choices[0].message.content
+        return response.choices[0].message.content
+    except OpenAIError as e:
+        logger.error(f"OpenAIError: {e}")
+        raise e

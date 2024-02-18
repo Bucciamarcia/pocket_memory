@@ -27,6 +27,7 @@ class Firestore_Db:
     def remove_user(self, user:str) -> tuple[any, int]:
         """
         Remove the user from the database.
+        First remove the user document and then remove the memories using the delete_memories method.
         """
         try:
             self.collection.document(user).delete()
@@ -36,6 +37,9 @@ class Firestore_Db:
             raise e
         
     def delete_memories(self, user, batch_size):
+        """
+        Deletes the memories of the user.
+        """
 
         coll_ref = self.collection.document(user).collection("memories")
         docs = coll_ref.list_documents(page_size=batch_size)
@@ -48,3 +52,11 @@ class Firestore_Db:
 
         if deleted >= batch_size:
             return Firestore_Db.delete_memories(coll_ref, batch_size)
+    
+    def get_all_users(self) -> list[str]:
+        """
+        Get all users from the database.
+        """
+        users = self.collection.list_documents(50)
+        logger.info(f"USERS:\n\n{users}")
+        return [user.id for user in users]
