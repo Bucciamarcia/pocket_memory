@@ -14,7 +14,7 @@ OPENAI_APIKEY
 
 Scripts to deploy pubsub functions to gcloud because they don't upòload with `firebase deploy`:
 
-```fish
+```bash
 gcloud functions deploy autoremove_guests \
   --gen2 \
   --region=europe-west3 \
@@ -22,3 +22,12 @@ gcloud functions deploy autoremove_guests \
   --entry-point=autoremove_guests \
   --trigger-topic=delete_guest_users
   ```
+
+```bash
+gcloud functions deploy remove_temp_memories \
+  --gen2 \
+  --region=europe-west3 \
+  --runtime=python311 \
+  --entry-point=remove_temp_memories \
+  --trigger-topic=remove_temp_memories
+```

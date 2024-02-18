@@ -8,6 +8,7 @@ import google.cloud.firestore
 import json
 import functions_framework
 import logging
+import datetime
 import google.cloud.logging
 from langchain_community.vectorstores.faiss import FAISS
 from langchain_openai import OpenAIEmbeddings
@@ -132,3 +133,22 @@ def autoremove_guests(cloud_event: CloudEvent) -> None:
     response_data = json.dumps({"data": {"result": is_anon}})
     response = https_fn.Response(response_data, status=200, headers={"Content-Type": "application/json"})
     return None
+
+@functions_framework.cloud_event
+def remove_temp_memories(cloud_event: CloudEvent) -> None:
+    users = Firestore_Db().get_all_users()
+    for user in users:
+        logger.info(f"Removing temporary memories for user: {user}")
+        memories = Firestore_Db().get_all_temporary_memories(user=user)
+        if not memories:
+            logger.info(f"No temporary memories found for user: {user}")
+            continue
+        for memory in memories:
+            logger.info(f"MEMORY: {memory}")
+            expiration_date = memory['expirationDate']
+            if expiration_date < datetime.datetime.now(tz=datetime.timezone.utc):
+                logger.info(f"Removing temporary memory: {memory}")
+                Firestore_Db().delete_single_memory(user=user, memory=memory["id"])
+            else:
+                logger.info(f"Temporary memory is not expired: {memory}")
+        logger.info(f"Temporary memories removed for user: {user}")

@@ -35,7 +35,24 @@ class CreateMemory {
       _db.collection("users").doc(userId).collection("memories").add({
         "embeddings": embeddings,
         "memoryText": memoryText,
-        "timestamp": FieldValue.serverTimestamp(),
+        "timestamp": DateTime.now(),
+        "isTemporary": false,
+      });
+      return 200;
+    } catch (e) {
+      debugPrint("Error adding memory: $e");
+      return 500;
+    }
+  }
+
+  Future<double> addTemporary(DateTime expirationDate) async {
+    try {
+      _db.collection("users").doc(userId).collection("memories").add({
+        "embeddings": embeddings,
+        "memoryText": memoryText,
+        "timestamp": DateTime.now(),
+        "isTemporary": true,
+        "expirationDate": expirationDate,
       });
       return 200;
     } catch (e) {

@@ -46,14 +46,30 @@ class _NewMemoryScreenState extends State<NewMemoryScreen> {
             ),
             Padding(
               padding: const EdgeInsets.only(left: 16, right: 16),
-              child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-                AddMemory(memoryText: _textEditingController.text),
-                const Padding(
-                  padding: EdgeInsets.only(left: 16),
-                ),
-                SpeechRecognitionWidget(textEditingController: _textEditingController,)
-              ],
-            ),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      AddMemory(memoryText: _textEditingController.text),
+                      const Padding(
+                        padding: EdgeInsets.only(left: 16),
+                      ),
+                      SpeechRecognitionWidget(
+                        textEditingController: _textEditingController,
+                      )
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 16,
+                  ),
+                    Row(
+                      children: [
+                        AddTempMemory(memoryText: _textEditingController.text),
+                      ],
+                    ),
+                ],
+              ),
             )
           ],
         ),
