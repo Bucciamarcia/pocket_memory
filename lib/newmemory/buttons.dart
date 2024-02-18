@@ -81,6 +81,7 @@ class AddMemory extends StatelessWidget {
                 backgroundColor: Colors.green[800],
               ),
             );
+            Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false);
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
@@ -169,8 +170,8 @@ class AddTempMemory extends StatelessWidget {
                     },
                   ),
                   TextButton(
-                    onPressed: () {
-                      final int result = buildMemory(
+                    onPressed: () async {
+                      final int result = await buildMemory(
                         memoryText,
                         int.parse(tempController.text),
                       );
@@ -181,6 +182,7 @@ class AddTempMemory extends StatelessWidget {
                             backgroundColor: Colors.green,
                           ),
                         );
+                        Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false);
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
