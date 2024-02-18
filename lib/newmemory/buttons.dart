@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; 
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import "package:cloud_functions/cloud_functions.dart";
 import 'package:pocket_memory/services/firestore.dart';
@@ -143,12 +143,14 @@ class AddTempMemory extends StatelessWidget {
           showDialog(
             context: context,
             builder: (BuildContext context) {
-              final TextEditingController tempController = TextEditingController();
+              final TextEditingController tempController =
+                  TextEditingController();
               return AlertDialog(
                 title: const Text('Set expiration'),
                 content: Column(
                   children: [
-                    const Text('Set an expiration, in number of days (max 365) for the memory.'),
+                    const Text(
+                        'Set an expiration, in number of days (max 365) for the memory.'),
                     TextField(
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       keyboardType: TextInputType.number,
@@ -168,7 +170,25 @@ class AddTempMemory extends StatelessWidget {
                   ),
                   TextButton(
                     onPressed: () {
-                      Navigator.of(context).pop(); // Dismiss the dialog
+                      final int result = buildMemory(
+                        memoryText,
+                        int.parse(tempController.text),
+                      );
+                      if (result == 200) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("Memory added!"),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("ERROR: Memory not added!"),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
                     },
                     child: const Text('Add Temporary Memory'),
                   ),
@@ -179,5 +199,41 @@ class AddTempMemory extends StatelessWidget {
         },
       ),
     );
+  }
+}
+
+buildMemory(String memoryText, int expirationDays) async {
+  List<double> embeddings = [];
+  try {
+    HttpsCallableResult<dynamic> result =
+        await FirebaseFunctions.instance.httpsCallable('get_embeddings').call(
+      {
+        "memoryText": memoryText,
+      },
+    );
+    embeddings = (result.data["embeddings"] as List<dynamic>)
+        .map((e) => e as double)
+        .toList();
+    debugPrint("EMBEDDINGS: $embeddings");
+  } catch (e) {
+    debugPrint("ERROR CAUGHT");
+    debugPrint(e.toString());
+    return 500;
+  }
+
+  // Calculate expiration date
+  DateTime expirationDate = DateTime.now().add(Duration(days: expirationDays));
+
+  Future<double> result = CreateMemory(
+    embeddings: embeddings,
+    memoryText: memoryText,
+  ).addTemporary(expirationDate);
+
+  debugPrint("RESULT TEMP: ${await result}");
+
+  if (await result == 200) {
+    return 200;
+  } else {
+    return 500;
   }
 }

@@ -53,10 +53,38 @@ class Firestore_Db:
         if deleted >= batch_size:
             return Firestore_Db.delete_memories(coll_ref, batch_size)
     
+    def delete_single_memory(self, user:str, memory:str) -> None:
+        """
+        Delete a single memory from the user.
+        """
+        try:
+            self.collection.document(user).collection("memories").document(memory).delete()
+        except Exception as e:
+            raise e
+    
     def get_all_users(self) -> list[str]:
         """
         Get all users from the database.
         """
         users = self.collection.list_documents(50)
-        logger.info(f"USERS:\n\n{users}")
-        return [user.id for user in users]
+        usrid_list = [user.id for user in users]
+        logger.info(f"Users: {usrid_list}")
+        return usrid_list
+    
+    def get_all_temporary_memories(self, user:str) -> list[dict[str, any]]:
+        """
+        Get all temporary memories from the user. It will only return the isTemporary and expirationDate fields.
+        """
+        try:
+            collection = self.collection.document(user).collection("memories")
+            query_ref = collection.where(filter=firestore.FieldFilter("isTemporary", "==", True))
+            memories = query_ref.select(["isTemporary", "expirationDate"]).stream()
+        except Exception as e:
+            logger.error(f"Error getting memories: {e}")
+            raise e
+        memories_list = []
+        for memory in memories:
+            memory_dict = memory.to_dict()
+            memory_dict["id"] = memory.id
+            memories_list.append(memory_dict)
+        return memories_list
