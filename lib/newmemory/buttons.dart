@@ -45,7 +45,7 @@ class AddMemory extends StatelessWidget {
             ),
         onPressed: () async {
           showLoadingDialog(context);
-          var timeout = Future.delayed(Duration(seconds: 5));
+          var timeout = Future.delayed(const Duration(seconds: 5));
           List<double> embeddings = [];
           try {
             HttpsCallableResult<dynamic> resultEmbeddings = await FirebaseFunctions
@@ -250,7 +250,6 @@ Future<int> buildMemory(String memoryText, int expirationDays) async {
 Future<void> showLoadingDialog(BuildContext context) async {
   return showDialog<void>(
     context: context,
-    barrierDismissible: false, // User must not close the dialog manually
     builder: (BuildContext context) {
       return const Dialog(
         child: Padding(
