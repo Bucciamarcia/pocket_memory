@@ -91,3 +91,12 @@ class Firestore_Db:
     
     def get_memories_stream(self, user:str) -> list:
         return self.db.collection("users").document(user).collection("memories").stream()
+    
+    def add_memory(self, user:str, memory:dict) -> None:
+        """
+        Add a memory to the user.
+        """
+        try:
+            self.collection.document(user).collection("memories").add(memory)
+        except Exception as e:
+            raise e

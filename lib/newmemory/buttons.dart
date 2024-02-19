@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import "package:cloud_functions/cloud_functions.dart";
-import 'package:pocket_memory/services/firestore.dart';
+import "../services/auth.dart";
 
 class AddMemory extends StatelessWidget {
   final String memoryText;
@@ -45,22 +45,18 @@ class AddMemory extends StatelessWidget {
             ),
         onPressed: () async {
           showLoadingDialog(context);
-          var timeout = Future.delayed(const Duration(seconds: 5));
-          List<double> embeddings = [];
           try {
-            HttpsCallableResult<dynamic> resultEmbeddings = await FirebaseFunctions
-                .instance
-                .httpsCallable('get_embeddings')
-                .call(
+            String userId = await AuthService().userId();
+            await FirebaseFunctions.instance.httpsCallable('add_memory').call(
               {
                 "memoryText": memoryText,
+                "isTemporary": false,
+                "user": userId,
+                "expiration": ""
               },
             );
-            embeddings = (resultEmbeddings.data["embeddings"] as List<dynamic>)
-                .map((e) => e as double)
-                .toList();
-            debugPrint("EMBEDDINGS: $embeddings");
           } catch (e) {
+            Navigator.of(context, rootNavigator: true).pop();
             debugPrint("ERROR CAUGHT");
             debugPrint(e.toString());
             ScaffoldMessenger.of(context).showSnackBar(
@@ -71,29 +67,15 @@ class AddMemory extends StatelessWidget {
             );
             return;
           }
-          Future<double> result = CreateMemory(
-            embeddings: embeddings,
-            memoryText: memoryText,
-          ).addPermanent();
-          debugPrint("RESULT: ${await result}");
-          await Future.any([result, timeout]);
           Navigator.of(context, rootNavigator: true).pop();
-          if (await result == 200) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Text("Memory added!"),
-                backgroundColor: Colors.green[800],
-              ),
-            );
-            Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false);
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text("ERROR: Memory not added!"),
-                backgroundColor: Colors.red,
-              ),
-            );
-          }
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text("Memory added!"),
+              backgroundColor: Colors.green[800],
+            ),
+          );
+          Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false);
         },
       ),
     );
@@ -175,12 +157,21 @@ class AddTempMemory extends StatelessWidget {
                   ),
                   TextButton(
                     onPressed: () async {
+                      int expirationDays = int.parse(tempController.text);
+
                       showLoadingDialog(context);
-                      final int result = await buildMemory(
-                        memoryText,
-                        int.parse(tempController.text),
-                      );
-                      if (result == 200) {
+                      try {
+                        String userId = await AuthService().userId();
+                        await FirebaseFunctions.instance
+                            .httpsCallable('add_memory')
+                            .call(
+                          {
+                            "memoryText": memoryText,
+                            "isTemporary": false,
+                            "user": userId,
+                            "expiration": expirationDays
+                          },
+                        );
                         Navigator.of(context, rootNavigator: true).pop();
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
@@ -188,15 +179,19 @@ class AddTempMemory extends StatelessWidget {
                             backgroundColor: Colors.green,
                           ),
                         );
-                        Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false);
-                      } else {
+                        Navigator.pushNamedAndRemoveUntil(
+                            context, "/", (route) => false);
+                      } catch (e) {
                         Navigator.of(context, rootNavigator: true).pop();
+                        debugPrint("ERROR CAUGHT");
+                        debugPrint(e.toString());
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text("ERROR: Memory not added!"),
                             backgroundColor: Colors.red,
                           ),
                         );
+                        return;
                       }
                     },
                     child: const Text('Add Temporary Memory'),
@@ -208,42 +203,6 @@ class AddTempMemory extends StatelessWidget {
         },
       ),
     );
-  }
-}
-
-Future<int> buildMemory(String memoryText, int expirationDays) async {
-  List<double> embeddings = [];
-  try {
-    HttpsCallableResult<dynamic> result =
-        await FirebaseFunctions.instance.httpsCallable('get_embeddings').call(
-      {
-        "memoryText": memoryText,
-      },
-    );
-    embeddings = (result.data["embeddings"] as List<dynamic>)
-        .map((e) => e as double)
-        .toList();
-    debugPrint("EMBEDDINGS: $embeddings");
-  } catch (e) {
-    debugPrint("ERROR CAUGHT");
-    debugPrint(e.toString());
-    return 500;
-  }
-
-  // Calculate expiration date
-  DateTime expirationDate = DateTime.now().add(Duration(days: expirationDays));
-
-  Future<double> result = CreateMemory(
-    embeddings: embeddings,
-    memoryText: memoryText,
-  ).addTemporary(expirationDate);
-
-  debugPrint("RESULT TEMP: ${await result}");
-
-  if (await result == 200) {
-    return 200;
-  } else {
-    return 500;
   }
 }
 

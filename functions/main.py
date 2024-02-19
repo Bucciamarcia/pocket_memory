@@ -40,12 +40,15 @@ logger.addHandler(consoleHandler)
 
 
 @https_fn.on_request()
-def get_embeddings(req: https_fn.Request) -> https_fn.Response:
+def add_memory(req: https_fn.Request) -> https_fn.Response:
     openai_apikey = os.environ.get('OPENAI_APIKEY', '')
     client = OpenAI(api_key=openai_apikey)
     logger.debug(f"Request: {req.json}")
     data = req.json["data"]
     memory = data['memoryText']
+    temporary = data['isTemporary']
+    expiration_days_to_add = data['expiration']
+    user = data['user']
     
     logger.info(f"Getting embeddings for memory: {memory}")
     try:
@@ -65,7 +68,27 @@ def get_embeddings(req: https_fn.Request) -> https_fn.Response:
     logger.debug(embeddings)
     logger.debug(f"length of embeddings: {len(embeddings)}")
 
-    response_data = json.dumps({"data": {"embeddings": embeddings}})
+    if expiration_days_to_add:
+        expiration_date = datetime.datetime.now(tz=datetime.timezone.utc) + datetime.timedelta(days=expiration_days_to_add)
+    
+    expiration = expiration_date if expiration_days_to_add else None
+
+    dict_to_add = {
+        "memoryText": memory,
+        "embeddings": embeddings,
+        "isTemporary": temporary,
+        "timestamp": datetime.datetime.now(tz=datetime.timezone.utc),
+        "expirationDate": expiration
+    }
+    logger.info(f"Adding memory to Firestore")
+    logger.debug(f"Memory to add: {dict_to_add}")
+    try:
+        Firestore_Db().add_memory(user=user, memory=dict_to_add)
+    except Exception as e:
+        logger.error(f"Error adding memory: {e}")
+        raise e
+    logger.info(f"Memory added to Firestore - SUCCESS!")
+    response_data = json.dumps({"data": {"result": "OK"}})
     response = https_fn.Response(response_data, status=200, headers={"Content-Type": "application/json"})
     return response
 
