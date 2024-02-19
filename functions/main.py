@@ -15,7 +15,7 @@ from langchain_openai import OpenAIEmbeddings
 from openai import OpenAI, OpenAIError
 import os
 from py import retrieve_memories
-from py.common import Firestore_Db
+from py.common import Firestore_Db, cors_headers_preflight, cors_headers
 from cloudevents.http.event import CloudEvent
 import firebase_admin
 
@@ -41,6 +41,11 @@ logger.addHandler(consoleHandler)
 
 @https_fn.on_request()
 def add_memory(req: https_fn.Request) -> https_fn.Response:
+
+    # Add CORS headers
+    if req.method == 'OPTIONS':
+        return cors_headers_preflight(req)
+    
     openai_apikey = os.environ.get('OPENAI_APIKEY', '')
     client = OpenAI(api_key=openai_apikey)
     logger.debug(f"Request: {req.json}")
@@ -90,10 +95,16 @@ def add_memory(req: https_fn.Request) -> https_fn.Response:
     logger.info(f"Memory added to Firestore - SUCCESS!")
     response_data = json.dumps({"data": {"result": "OK"}})
     response = https_fn.Response(response_data, status=200, headers={"Content-Type": "application/json"})
+
+    response = cors_headers(response)
+
     return response
 
 @https_fn.on_request()
 def retrieve_memory(req: https_fn.Request) -> https_fn.Response:
+    # Add CORS headers
+    if req.method == 'OPTIONS':
+        return cors_headers_preflight(req)
     logger.debug(f"Request: {req.json}")
     data = req.json["data"]
     query = data['memoryText']
@@ -134,6 +145,9 @@ def retrieve_memory(req: https_fn.Request) -> https_fn.Response:
     # Return a 200 response for now
     response_data = json.dumps({"data": {"answer": answer}})
     response = https_fn.Response(response_data, status=200, headers={"Content-Type": "application/json"})
+
+    response = cors_headers(response)
+    
     return response
 
 @functions_framework.cloud_event
